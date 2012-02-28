@@ -218,6 +218,19 @@ class Buffer extends AbstractEvent {
     }
 
     /**
+     * Calling this method will make sure that the onRead callback is only
+     * called when the buffersize exceeds the given argument.
+     *
+     * @param int $bufferSize
+     * @return void
+     */
+    public function setReadBufferSize($bufferSize) {
+
+        event_buffer_watermark_set($this->resource, self::READ, $bufferSize, null);
+
+    }
+
+    /**
      * Frees the event
      *
      * @return void

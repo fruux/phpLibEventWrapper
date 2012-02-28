@@ -76,15 +76,14 @@ class BufferedLogParser extends AbstractEvent {
 
         $self = $this;
         $this->buffer->onEOF = function() use ($self) {
-            echo "EOF reached\n";
             $self->flush();
         };
 
         if ($timeout!==-1) {
             $this->buffer->setTimeout($timeout);
         }
+        $this->buffer->setReadBufferSize($bufferSize);
         $this->buffer->onTimeout = function($buffer) use ($self) {
-            echo "timeout\n";
             $self->flush();
 
             // Need to re-enable the buffer. We're just using the timeout to
@@ -101,10 +100,9 @@ class BufferedLogParser extends AbstractEvent {
      */
     public function readLines() {
 
-        $this->bufferStr.=$this->buffer->read(4096);
-        if (strlen($this->bufferStr) >= $this->bufferSize) {
-            $this->flush();
-        }
+        $str = $this->buffer->read($this->bufferSize);
+        $this->bufferStr.=$str;
+        $this->flush();
 
     }
 
@@ -143,7 +141,7 @@ class BufferedLogParser extends AbstractEvent {
         $lastNewLine = strrpos($this->bufferStr,$newLine);
 
         // There was no data to flush
-        if (!$lastNewLine===false) {
+        if ($lastNewLine===false) {
             return;
         }
 
