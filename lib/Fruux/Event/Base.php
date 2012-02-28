@@ -72,7 +72,7 @@ class Base {
      * 
      * @return bool 
      */
-    public function break() {
+    public function breakLoop() {
 
         return event_base_loopbreak($this->eventBase);
 
@@ -87,7 +87,7 @@ class Base {
      * @param int $timeout 
      * @return void
      */
-    public function exit($timeout = -1) {
+    public function exitLoop($timeout = -1) {
 
         return event_base_loopexit($this->eventBase);
 
