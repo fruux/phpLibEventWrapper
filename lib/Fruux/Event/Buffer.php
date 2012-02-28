@@ -38,6 +38,27 @@ class Buffer extends AbstractEvent {
     public $onWrite;
 
     /**
+     * Triggered when the end of the stream has been reached. Feel free to
+     * ignore it, if you intend to create tail-like functionality.
+     *
+     * This callback receives an instance of this object as teh first argument.
+     *
+     * @var callable
+     */
+    public $onEOF;
+
+    /**
+     * This callback is triggered when the read or write timeout has been reached.
+     *
+     * This callback received an instance of this object as the first argument.
+     * The second argument is either READ or WRITE depending on which
+     * timeout was hit.
+     *
+     * @var callbable
+     */
+    public $onTimeout;
+
+    /**
      * This callback will be triggered every time an error has occurred.
      *
      * The error code is supplied as the first argument, an instance of this
@@ -95,7 +116,19 @@ class Buffer extends AbstractEvent {
                 }
             },
             function($discard, $errorCode) use ($self) {
-                if ($self->onError) {
+
+                if ($errorCode & EVBUFFER_EOF) {
+
+                    if ($self->onEOF)
+                        call_user_func($self->onEOF, $self);
+
+                } elseif ($errorCode & EVBUFFER_TIMEOUT) {
+
+                    if ($self->onTimeout)
+                        call_user_func($self->onTimeout, $self, $errorCode & ( Buffer::READ || Buffer::WRITE ));
+
+
+                } elseif ($self->onError) {
                     call_user_func($self->onError, $self, $errorCode);
                 }
             }
@@ -144,6 +177,47 @@ class Buffer extends AbstractEvent {
     }
 
     /**
+     * This method is called by an EventBase after the event has been added.
+     *
+     * @return void
+     */
+    public function enable() {
+
+        event_buffer_enable($this->resource, $this->operations);
+
+    }
+
+    /**
+     * Sets the Event Base
+     *
+     * @param Base $base
+     * @return bool
+     */
+    public function setBase(Base $base) {
+
+        event_buffer_base_set($this->resource, $base->getResource());
+        $this->enable();
+
+    }
+
+    /**
+     * Sets the read and write timeout
+     *
+     * If one argument is supplied, it will be used as both the read and write
+     * timeout. If two arguments are supplied, the first is the read, the
+     * second is the write timeout.
+     *
+     * @param int $readTimeOut
+     * @param int $writeTimeOut
+     * @return void
+     */
+    public function setTimeout($readTimeOut, $writeTimeOut = null) {
+
+        event_buffer_timeout_set($this->resource, $readTimeOut, (is_null($writeTimeOut)?$readTimeOut:$writeTimeOut));
+
+    }
+
+    /**
      * Frees the event
      *
      * @return void
@@ -152,17 +226,6 @@ class Buffer extends AbstractEvent {
 
         event_buffer_free($this->resource);
         unset($this->resource);
-
-    }
-
-    /**
-     * This method is called by an EventBase after the event has been added.
-     *
-     * @return void
-     */
-    public function enable() {
-
-        event_buffer_enable($this->resource, $this->operations);
 
     }
 

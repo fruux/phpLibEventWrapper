@@ -19,13 +19,14 @@ abstract class AbstractEvent {
     protected $resource;
 
     /**
-     * Returns the underlying event resource
+     * Sets the Event Base
      *
-     * @return resource
+     * @param Base $base
+     * @return bool
      */
-    public function getResource() {
+    public function setBase(Base $base) {
 
-        return $this->resource;
+        return event_base_set($this->resource, $base->getResource());
 
     }
 

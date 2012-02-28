@@ -94,20 +94,30 @@ class Base {
     }
 
     /**
-     * Adds an event to the loop
+     * Adds an event to the loop.
+     *
+     * This just calls the add method of the Event, and is really just a
+     * shortcut.
      *
      * @return void
      */
     public function add(AbstractEvent $event) {
 
-        if ($event instanceof Buffer) {
-            event_buffer_base_set($event->getResource(), $this->resource);
-            $event->enable();
-        } else {
-            event_base_set($event->getResource(), $this->resource);
-        }
+        $event->setBase($this);
 
     }
+
+    /**
+     * Returns the underlying event resource
+     *
+     * @return resource
+     */
+    public function getResource() {
+
+        return $this->resource;
+
+    }
+
 
     /**
      * Frees up any open resources
