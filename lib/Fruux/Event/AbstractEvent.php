@@ -11,7 +11,7 @@ namespace Fruux\Event;
  * @author Evert Pot (http://www.rooftopsolutions.nl/) 
  * @license http://www.opensource.org/licenses/mit-license.php MIT License
  */
-abstract class AbstractEvent extends Event {
+abstract class AbstractEvent {
 
     protected $resource;
 
