@@ -75,16 +75,15 @@ class BufferedLogParser extends AbstractEvent {
         };
 
         $self = $this;
-        $this->buffer->onEOF = function() use ($self) {
-            $this->readLines();
-        };
+        $this->buffer->onEOF = array($this, 'readLines');
 
         if ($timeout!==-1) {
             $this->buffer->setTimeout($timeout);
         }
         $this->buffer->setReadBufferSize($bufferSize);
         $this->buffer->onTimeout = function($buffer) use ($self) {
-            $this->readLines();
+
+            $self->readLines();
 
             // Need to re-enable the buffer. We're just using the timeout to
             // force a flush
