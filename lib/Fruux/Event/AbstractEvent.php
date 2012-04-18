@@ -30,4 +30,20 @@ abstract class AbstractEvent {
 
     }
 
+    /**
+     * Frees the event, cleans up resources
+     *
+     * @return void
+     */
+    abstract function free();
+
+    /**
+     * Free up resources
+     */
+    public function __destruct() {
+
+        $this->free();
+
+    }
+
 }

@@ -231,14 +231,15 @@ class Buffer extends AbstractEvent {
     }
 
     /**
-     * Frees the event
+     * Frees the event, cleans up resources
      *
      * @return void
      */
-    public function __destruct() {
+    public function free() {
 
+        if (is_null($this->resource)) return null;
         event_buffer_free($this->resource);
-        unset($this->resource);
+        $this->resource = null;
 
     }
 

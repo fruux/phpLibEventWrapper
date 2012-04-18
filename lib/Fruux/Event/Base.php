@@ -32,6 +32,14 @@ class Base {
     protected $resource;
 
     /**
+     * This is a list of associated events. We maintain this list so we can
+     * remove them if the base is destroyed.
+     *
+     * @var array
+     */
+    protected $events;
+
+    /**
      * Creates the main event loop
      *
      * @param int $priorities The number of different priorities
@@ -104,6 +112,7 @@ class Base {
     public function add(AbstractEvent $event) {
 
         $event->setBase($this);
+        $this->events[] = $event;
 
     }
 
@@ -124,6 +133,9 @@ class Base {
      */
     public function __destruct() {
 
+        foreach($this->events as $event) {
+            $event->free();
+        }
         event_base_free($this->resource);
         unset($this->resource);
 

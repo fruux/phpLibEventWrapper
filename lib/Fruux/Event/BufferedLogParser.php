@@ -64,7 +64,7 @@ class BufferedLogParser extends AbstractEvent {
      */
     public function __construct($stream, $bufferSize = 65536, $timeout = -1) {
 
-        $this->buffer = new Buffer($stream,Buffer::READ);
+        $this->buffer = new Buffer($stream, Buffer::READ);
         $this->bufferSize = $bufferSize;
 
         $this->buffer->onRead = array($this,'readLines');
@@ -151,6 +151,15 @@ class BufferedLogParser extends AbstractEvent {
             call_user_func($this->onFlush, $this, $this->bufferStr);
         }
         $this->bufferStr = $leftOverBytes;
+
+    }
+
+    /**
+     * frees up resources
+     */
+    public function free() {
+
+        $this->buffer->free();
 
     }
 
